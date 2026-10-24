@@ -98,8 +98,25 @@ def best_split(features, labels, feature_indices):
         "score": float(best_score)
     }
 
-# Step 5 - should_stop (not yet solved)
-# TODO: implement
+# Step 5 - should_stop
+def should_stop(labels, depth, max_depth, min_samples_split):
+    """Return True if this node should become a leaf instead of splitting further."""
+    # TODO: decide whether to stop growing based on purity, depth, and size...
+    labels = np.array(labels)
+
+    # 1. Pure node: all labels are the same
+    if len(np.unique(labels)) == 1:
+        return True
+
+    # 2. Reached maximum depth
+    if depth >= max_depth:
+        return True
+
+    # 3. Too few samples to split
+    if len(labels) < min_samples_split:
+        return True
+
+    return False
 
 # Step 6 - leaf_prediction (not yet solved)
 # TODO: implement
