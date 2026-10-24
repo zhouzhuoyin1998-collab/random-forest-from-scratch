@@ -127,8 +127,82 @@ def leaf_prediction(labels):
 
     return int(values[np.argmax(counts)])
 
-# Step 7 - build_tree (not yet solved)
-# TODO: implement
+# Step 7 - build_tree
+def build_tree(features, labels, max_depth=10, min_samples_split=2, feature_subset=None, depth=0):
+    # TODO: recursively grow a decision tree, returning a nested dict of leaf/internal nodes.
+    features = np.array(features)
+    labels = np.array(labels)
+
+    # 1. Stopping condition
+    if should_stop(
+        labels,
+        depth,
+        max_depth,
+        min_samples_split
+    ):
+        return {
+            "leaf": True,
+            "prediction": leaf_prediction(labels)
+        }
+
+    # 2. Decide which features may be used
+    if feature_subset is None:
+        feature_indices = list(range(features.shape[1]))
+    else:
+        feature_indices = feature_subset
+
+    # 3. Find best split
+    split = best_split(
+        features,
+        labels,
+        feature_indices
+    )
+
+    # 4. No useful split
+    if split["feature_index"] is None or split["score"] <= 0:
+        return {
+            "leaf": True,
+            "prediction": leaf_prediction(labels)
+        }
+
+    feature_index = split["feature_index"]
+    threshold = split["threshold"]
+
+    # 5. Split dataset
+    left_features, left_labels, right_features, right_labels = split_dataset(
+        features,
+        labels,
+        feature_index,
+        threshold
+    )
+
+    # 6. Recursively build children
+    left_node = build_tree(
+        left_features,
+        left_labels,
+        max_depth,
+        min_samples_split,
+        feature_subset,
+        depth + 1
+    )
+
+    right_node = build_tree(
+        right_features,
+        right_labels,
+        max_depth,
+        min_samples_split,
+        feature_subset,
+        depth + 1
+    )
+
+    # 7. Return internal node
+    return {
+        "leaf": False,
+        "feature_index": feature_index,
+        "threshold": threshold,
+        "left": left_node,
+        "right": right_node
+    }
 
 # Step 8 - predict_example_tree (not yet solved)
 # TODO: implement
